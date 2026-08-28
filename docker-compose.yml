@@ -1,8 +1,6 @@
 services:
   iptv-server:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    image: ghcr.io/mrsibe/iptv-server:latest
     ports:
       - "8889:8889"
     volumes:
