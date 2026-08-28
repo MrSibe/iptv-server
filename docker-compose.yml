@@ -1,0 +1,13 @@
+services:
+  iptv-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8889:8889"
+    volumes:
+      - ./data:/app/data
+      - ./app:/app/app
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
