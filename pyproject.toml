@@ -1,6 +1,6 @@
 [project]
 name = "iptv-server"
-version = "0.2.0"
+version = "1.0.0"
 description = "A small, YAML-configured IPTV playlist and HLS proxy server"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -25,6 +25,7 @@ package = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.ruff]
@@ -33,4 +34,3 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "ASYNC"]
-

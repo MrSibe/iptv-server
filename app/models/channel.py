@@ -30,6 +30,10 @@ def _validate_http_url(value: str) -> str:
     parsed = urlsplit(value)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         raise ValueError("URL must use http or https and include a host")
+    try:
+        _ = parsed.port
+    except ValueError as exc:
+        raise ValueError("URL contains an invalid port") from exc
     return value
 
 

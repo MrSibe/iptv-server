@@ -34,8 +34,14 @@ _signing_key = secrets.token_bytes(32)
 
 def redact_url(url: str) -> str:
     parsed = urlsplit(url)
+    hostname = parsed.hostname or ""
+    if ":" in hostname and not hostname.startswith("["):
+        hostname = f"[{hostname}]"
+    netloc = hostname
+    if parsed.port is not None:
+        netloc = f"{netloc}:{parsed.port}"
     query = "<redacted>" if parsed.query else ""
-    return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, query, ""))
+    return urlunsplit((parsed.scheme, netloc, parsed.path, query, ""))
 
 
 async def init_session() -> aiohttp.ClientSession:

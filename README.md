@@ -83,18 +83,10 @@ Docker Compose 会只读挂载 `config/config.yaml`。保存配置后通常会�
 - Host、Content-Length、Connection 等逐跳或传输控制请求头不允许配置。
 - 日志不会打印 URL 查询参数，也不会输出 Cookie 或 Authorization 的值。
 
-## 从 SQLite 升级
+## 1.0 升级说明
 
-新版运行时不再读取 SQLite。升级前先停止旧服务并备份数据库，然后执行：
-
-```powershell
-uv run python scripts/export_channels.py `
-  --database data/channels.db `
-  --output config/config.yaml
-```
-
-如果输出文件已经存在，工具默认拒绝覆盖。确认需要替换时显式添加 `--force`。
-导出后检查 YAML，再启动新版服务。原数据库不会被修改或删除。
+1.0 是 breaking change：运行时只读取 YAML，不再读取或迁移旧版 `channels.db`。
+升级时请参考示例手工建立 `config/config.yaml`；确认频道可用后，可以自行归档旧数据库。
 
 ## 接口
 

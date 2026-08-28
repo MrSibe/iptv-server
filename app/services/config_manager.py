@@ -100,6 +100,7 @@ class ChannelConfig:
 
         if revision == self._revision:
             self._observed_revision = revision
+            self._last_error = None
             return False
 
         self._apply(config, revision)

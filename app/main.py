@@ -35,7 +35,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title="IPTV Server",
     description="YAML-configured IPTV playlist and HLS proxy server",
-    version="0.2.0",
+    version="1.0.0",
     lifespan=lifespan,
 )
 
@@ -68,7 +68,7 @@ async def root() -> dict[str, object]:
             "playlist_json": "/channels.json",
             "api_docs": "/docs",
         },
-        "version": "0.2.0",
+        "version": "1.0.0",
     }
 
 

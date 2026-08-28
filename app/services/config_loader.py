@@ -15,18 +15,30 @@ class ConfigLoadError(ValueError):
     pass
 
 
-def _expand_environment(raw: str) -> str:
+def _expand_environment(data: object) -> object:
     missing: set[str] = set()
 
-    def replace(match: re.Match[str]) -> str:
-        name = match.group(1)
-        value = os.environ.get(name)
-        if value is None:
-            missing.add(name)
-            return match.group(0)
+    def replace_string(value: str) -> str:
+        def replace(match: re.Match[str]) -> str:
+            name = match.group(1)
+            environment_value = os.environ.get(name)
+            if environment_value is None:
+                missing.add(name)
+                return match.group(0)
+            return environment_value
+
+        return ENV_PATTERN.sub(replace, value)
+
+    def visit(value: object) -> object:
+        if isinstance(value, str):
+            return replace_string(value)
+        if isinstance(value, list):
+            return [visit(item) for item in value]
+        if isinstance(value, dict):
+            return {key: visit(item) for key, item in value.items()}
         return value
 
-    expanded = ENV_PATTERN.sub(replace, raw)
+    expanded = visit(data)
     if missing:
         names = ", ".join(sorted(missing))
         raise ConfigLoadError(f"missing environment variables: {names}")
@@ -40,9 +52,8 @@ def load_config(path: Path) -> tuple[AppConfig, str]:
         raise ConfigLoadError(f"cannot read config {path}: {exc}") from exc
 
     revision = hashlib.sha256(raw.encode("utf-8")).hexdigest()
-    expanded = _expand_environment(raw)
     try:
-        data = yaml.safe_load(expanded)
+        data = yaml.safe_load(raw)
     except yaml.MarkedYAMLError as exc:
         location = ""
         if exc.problem_mark is not None:
@@ -51,9 +62,9 @@ def load_config(path: Path) -> tuple[AppConfig, str]:
 
     if data is None:
         raise ConfigLoadError("configuration file is empty")
+    expanded = _expand_environment(data)
     try:
-        config = AppConfig.model_validate(data)
+        config = AppConfig.model_validate(expanded)
     except ValidationError as exc:
         raise ConfigLoadError(str(exc)) from exc
     return config, revision
-
